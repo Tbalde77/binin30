@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0c0c0e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BinIn30">
+<meta name="description" content="AI-powered quote generator for HVAC, Electrical & Plumbing contractors in RTP, Cary, Durham NC.">
+<title>BinIn30 — Quote in 30 Seconds</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0c0c0e;--surface:#141418;--surface2:#1c1c22;--border:#2a2a32;
+  --orange:#f97316;--orange2:#fb923c;--text:#f0f0f0;--muted:#6b7280;--faint:#3a3a44;
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--yellow:#f59e0b;
+  --font:'Syne',sans-serif;--mono:'DM Mono',monospace;
+  --nav-h:56px;--bottom-h:72px;
+}
+html,body{height:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+
+/* NAV */
+.nav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:var(--nav-h);position:sticky;top:0;z-index:200}
+.logo{font-size:20px;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:10px}
+.logo-text span{color:var(--orange)}
+.logo-img{height:32px;width:32px;border-radius:6px;object-fit:cover}
+.nav-right{display:flex;align-items:center;gap:10px}
+.quota-badge{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:11px;padding:4px 10px;border-radius:20px;font-family:var(--mono)}
+.quota-badge.low{border-color:#78350f;color:var(--yellow)}
+.quota-badge.empty{border-color:#7f1d1d;color:var(--red)}
+.btn-upgrade{background:var(--orange);color:#000;font-weight:700;font-size:11px;padding:6px 14px;border-radius:6px;border:none;cursor:pointer;font-family:var(--font)}
+.btn-login{background:transparent;color:var(--muted);font-size:11px;padding:6px 12px;border-radius:6px;border:1px solid var(--border);cursor:pointer;font-family:var(--font)}
+.btn-logout{background:transparent;color:var(--red);font-size:11px;padding:6px 12px;border-radius:6px;border:1px solid #3a1414;cursor:pointer;font-family:var(--font)}
+.user-pill{display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:11px;font-family:var(--mono)}
+.pro-crown{color:var(--orange);font-size:12px}
+
+/* HERO */
+.hero{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+.hero h1{font-size:26px;font-weight:800;letter-spacing:-1px;line-height:1;margin-bottom:3px}
+.hero h1 em{color:var(--orange);font-style:normal}
+.hero-sub{color:var(--muted);font-size:11px;margin-bottom:14px;font-family:var(--mono)}
+.stats-row{display:flex;gap:20px}
+.stat-val{font-size:18px;font-weight:800;color:var(--orange)}
+.stat-lbl{font-size:10px;color:var(--muted);font-family:var(--mono)}
+
+/* SPLIT */
+.split{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - var(--nav-h) - 90px)}
+.panel-form{background:var(--surface);border-right:1px solid var(--border);padding:20px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.field-group{display:flex;flex-direction:column;gap:5px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lbl{font-size:10px;color:var(--muted);font-family:var(--mono);letter-spacing:0.8px;text-transform:uppercase}
+input[type=text],input[type=number],input[type=email],input[type=password],select,textarea{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:6px;color:var(--text);font-family:var(--font);font-size:14px;
+  padding:10px 12px;outline:none;transition:border 0.15s;
+  -webkit-appearance:none;appearance:none
+}
+input:focus,select:focus,textarea:focus{border-color:var(--orange)}
+select{cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+textarea{resize:vertical;min-height:80px}
+.urgency-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.urgency-btn{background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:10px;font-weight:700;font-family:var(--mono);padding:10px 4px;cursor:pointer;text-align:center;transition:all 0.15s;min-height:44px;display:flex;align-items:center;justify-content:center}
+.urgency-btn.active{border-color:var(--orange);color:var(--orange);background:#1f120a}
+.gen-btn{width:100%;padding:16px;background:var(--orange);border:none;border-radius:10px;color:#000;font-weight:800;font-size:16px;font-family:var(--font);cursor:pointer;min-height:54px;transition:all 0.15s}
+.gen-btn:disabled{background:var(--faint);color:var(--muted);cursor:not-allowed}
+.manual-btn{width:100%;padding:11px;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:13px;font-family:var(--font);cursor:pointer}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chip{background:var(--surface2);border:1px solid var(--border);border-radius:20px;color:var(--muted);font-size:11px;font-family:var(--mono);padding:5px 11px;cursor:pointer;transition:all 0.15s}
+.chip:hover{border-color:var(--orange);color:var(--orange)}
+
+/* QUOTE PANEL */
+.panel-quote{background:var(--bg);display:flex;flex-direction:column}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);background:var(--surface);overflow-x:auto}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab{padding:13px 16px;font-size:11px;font-weight:700;font-family:var(--mono);color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;letter-spacing:0.5px;text-transform:uppercase;min-height:44px;display:flex;align-items:center;gap:5px;transition:all 0.15s}
+.tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+.tab-badge{background:var(--surface2);border-radius:10px;padding:1px 6px;font-size:10px}
+.tab-pro{font-size:9px;background:#1f120a;border:1px solid var(--orange);color:var(--orange);border-radius:4px;padding:1px 5px}
+.quote-area{flex:1;padding:20px;overflow-y:auto}
+
+/* CARDS / NOTICES */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;gap:10px;color:var(--muted);text-align:center;padding:32px}
+.empty-icon{font-size:40px;opacity:0.2}
+.empty-title{font-size:16px;font-weight:700;color:var(--faint)}
+.empty-sub{font-size:12px;font-family:var(--mono);max-width:240px;line-height:1.6}
+.ai-note{background:#0f1c0a;border:1px solid #1e3a14;border-radius:8px;padding:12px 14px;font-size:12px;color:#86efac;font-family:var(--mono);margin-bottom:14px;display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:var(--green);margin-top:4px;flex-shrink:0}
+.error-note{background:#1c0a0a;border:1px solid #3a1414;border-radius:8px;padding:12px 14px;font-size:12px;color:#fca5a5;font-family:var(--mono);margin-bottom:14px}
+.pro-gate{background:#0f0c02;border:1px solid #78350f;border-radius:8px;padding:16px;text-align:center;margin-bottom:14px}
+.pro-gate-title{font-size:14px;font-weight:700;color:var(--orange);margin-bottom:4px}
+.pro-gate-sub{font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:12px}
+
+/* ITEMS TABLE */
+.quote-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.quote-meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.qnum{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--surface);border:1px solid var(--border);padding:4px 9px;border-radius:4px}
+.qstatus{font-size:10px;font-weight:700;padding:4px 9px;border-radius:4px;font-family:var(--mono)}
+.status-draft{background:#1c1500;color:var(--yellow);border:1px solid #78350f}
+.status-ready{background:#052e16;color:var(--green);border:1px solid #166534}
+.quote-actions{display:flex;gap:7px;flex-wrap:wrap}
+.act-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);font-size:11px;font-family:var(--mono);padding:7px 12px;border-radius:6px;cursor:pointer;min-height:34px;transition:all 0.15s}
+.act-btn:hover{border-color:var(--orange);color:var(--orange)}
+.act-btn-primary{background:var(--orange);border-color:var(--orange);color:#000;font-weight:700}
+.act-btn-primary:hover{background:var(--orange2);color:#000}
+.items-table{width:100%;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px}
+.items-head{display:grid;grid-template-columns:2fr 52px 90px 80px 32px;background:var(--surface);padding:8px 12px;font-size:9px;font-family:var(--mono);color:var(--muted);letter-spacing:1px;text-transform:uppercase;gap:6px}
+.item-row{display:grid;grid-template-columns:2fr 52px 90px 80px 32px;padding:8px 12px;border-top:1px solid var(--border);gap:6px;align-items:center}
+.item-row:hover{background:#0f0f12}
+.item-row input{background:transparent;border:none;border-bottom:1px solid transparent;color:var(--text);font-family:var(--font);font-size:13px;padding:2px 0;width:100%;outline:none;min-height:30px}
+.item-row input:focus{border-bottom-color:var(--orange)}
+.price-cell{display:flex;align-items:center;gap:3px}
+.price-cell span{color:var(--muted);font-size:11px}
+.total-cell{font-family:var(--mono);font-size:12px;text-align:right}
+.del-btn{background:none;border:none;color:var(--faint);cursor:pointer;font-size:18px;padding:4px;min-width:32px;min-height:32px;display:flex;align-items:center;justify-content:center}
+.del-btn:hover{color:var(--red)}
+.items-footer{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-top:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.add-item-btn{background:transparent;border:1px dashed var(--border);color:var(--muted);font-size:12px;font-family:var(--mono);padding:7px 14px;border-radius:6px;cursor:pointer;min-height:34px}
+.add-item-btn:hover{border-color:var(--green);color:var(--green)}
+.totals-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;width:100%;max-width:260px;margin-left:auto;margin-bottom:14px}
+.tot-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--muted);font-family:var(--mono)}
+.tot-divider{height:1px;background:var(--border);margin:8px 0}
+.tot-total{display:flex;justify-content:space-between;font-size:18px;font-weight:800;color:var(--orange)}
+
+/* RISK ADVISOR */
+.risk-section{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:14px}
+.risk-title{font-size:11px;font-weight:700;font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;color:var(--yellow);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.risk-group{margin-bottom:10px}
+.risk-group-label{font-size:10px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px}
+.risk-items{display:flex;flex-wrap:wrap;gap:5px}
+.risk-item{background:var(--surface2);border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:var(--mono);padding:3px 8px;color:var(--text)}
+.risk-item.delay{border-color:#78350f;color:var(--yellow);background:#1c1200}
+.risk-item.permit{border-color:#1e3a5f;color:#93c5fd;background:#0a1628}
+.field-notes{background:#0a0f1c;border:1px solid #1e3a5f;border-radius:8px;padding:14px;margin-bottom:14px}
+.field-notes-title{font-size:11px;font-weight:700;font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;color:#93c5fd;margin-bottom:8px}
+.field-note-item{font-size:12px;color:#cbd5e1;font-family:var(--mono);padding:3px 0;display:flex;gap:7px}
+.field-note-item::before{content:"→";color:#3b82f6;flex-shrink:0}
+
+/* HISTORY */
+.hist-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:13px;cursor:pointer;transition:all 0.15s;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.hist-item:hover{border-color:var(--orange)}
+.hist-name{font-size:13px;font-weight:700}
+.hist-meta{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:2px}
+.hist-amount{font-size:15px;font-weight:800;color:var(--orange);font-family:var(--mono)}
+
+/* PRINT DOC */
+.print-doc{background:#fff;color:#111;font-family:var(--font);padding:40px 48px;border-radius:8px;font-size:14px}
+.print-doc table{width:100%;border-collapse:collapse;margin:16px 0}
+.print-doc th{background:#0c0c0e;color:#fff;padding:10px 12px;font-size:11px;text-align:left;text-transform:uppercase;letter-spacing:1px}
+.print-doc td{padding:10px 12px;border-bottom:1px solid #eee;font-size:13px}
+.print-logo{height:48px;max-width:160px;object-fit:contain;margin-bottom:6px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;width:100%;max-width:440px;position:relative}
+.modal-title{font-size:20px;font-weight:800;margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--muted);font-family:var(--mono);margin-bottom:24px}
+.modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:4px}
+.form-gap{display:flex;flex-direction:column;gap:14px}
+.btn-full{width:100%;padding:14px;border:none;border-radius:8px;font-weight:800;font-size:15px;font-family:var(--font);cursor:pointer;transition:all 0.15s}
+.btn-orange{background:var(--orange);color:#000}
+.btn-orange:hover{background:var(--orange2)}
+.btn-dark{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-google{background:#fff;color:#111;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;gap:8px}
+.divider-text{text-align:center;font-size:12px;color:var(--muted);font-family:var(--mono);position:relative}
+.divider-text::before,.divider-text::after{content:"";position:absolute;top:50%;width:40%;height:1px;background:var(--border)}
+.divider-text::before{left:0}
+.divider-text::after{right:0}
+.plan-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.plan-card{background:var(--surface2);border:2px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:all 0.15s}
+.plan-card.selected{border-color:var(--orange)}
+.plan-price{font-size:22px;font-weight:800;color:var(--orange)}
+.plan-name{font-size:13px;font-weight:700;margin-bottom:3px}
+.plan-features{font-size:11px;color:var(--muted);font-family:var(--mono);line-height:1.6}
+
+/* LOADING */
+.loading-bar{height:3px;background:var(--orange);animation:ld 1.4s ease infinite;margin-bottom:14px;border-radius:2px}
+@keyframes ld{0%{width:0%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0%;margin-left:100%}}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* MOBILE */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);height:var(--bottom-h);z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.bottom-nav-inner{display:flex;height:100%}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:var(--muted);font-size:9px;font-family:var(--mono);font-weight:700;letter-spacing:0.5px;text-transform:uppercase;border:none;background:none;padding:0;min-height:44px}
+.bnav-item.active{color:var(--orange)}
+.bnav-icon{font-size:18px;line-height:1}
+.bnav-gen{background:var(--orange);color:#000;font-weight:800;border-radius:12px;margin:6px 8px;font-size:12px;flex-direction:row;gap:5px}
+.mobile-view{display:none;flex-direction:column;flex:1;overflow-y:auto}
+.mobile-view.active{display:flex}
+.mobile-view.active.form-pad{padding:16px;gap:14px}
+.mobile-view.active.content-pad{padding:16px}
+
+@media(max-width:768px){
+  :root{--nav-h:52px;--bottom-h:66px}
+  .hero{padding:14px 16px 12px}
+  .hero h1{font-size:21px}
+  .split{display:none}
+  .bottom-nav{display:flex}
+  .app-body{padding-bottom:var(--bottom-h)}
+  .items-head{grid-template-columns:2fr 44px 78px 68px 28px;font-size:8px;padding:7px 10px}
+  .item-row{grid-template-columns:2fr 44px 78px 68px 28px;padding:7px 10px}
+  .print-doc{padding:22px 18px}
+  .totals-block{max-width:100%}
+  .plan-cards{grid-template-columns:1fr}
+}
+@media(min-width:769px){
+  .mobile-view,.bottom-nav{display:none!important}
+  .split{display:grid}
+}
+@media print{
+  .nav,.panel-form,.tab-bar,.quote-header,.items-footer,.quote-actions,.bottom-nav,.hero,.risk-section,.field-notes{display:none!important}
+  .split{grid-template-columns:1fr}
+  .panel-quote{width:100%}
+  .print-doc{padding:20px;border-radius:0;box-shadow:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="logo">
+    <img class="logo-img" id="nav-logo" src="" alt="" style="display:none" onerror="this.style.display='none'">
+    <div class="logo-text">Bin<span>In30</span></div>
+  </div>
+  <div class="nav-right" id="nav-right">
+    <div class="quota-badge" id="quota-badge">FREE · 5 quotes left</div>
+    <button class="btn-login" onclick="openModal('login')">Sign in</button>
+    <button class="btn-upgrade" onclick="openModal('upgrade')">Pro $29/mo</button>
+  </div>
+</nav>
+
+<div class="app-body">
+  <!-- HERO -->
+  <div class="hero">
+    <h1>Quote in <em>30 seconds.</em></h1>
+    <p class="hero-sub">// AI estimates · HVAC · Electrical · Plumbing · RTP · Cary · Durham · NC</p>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-val" id="s-quotes">0</div><div class="stat-lbl">today</div></div>
+      <div class="stat"><div class="stat-val" id="s-value">$0</div><div class="stat-lbl">value</div></div>
+      <div class="stat"><div class="stat-val" id="s-time">—</div><div class="stat-lbl">last</div></div>
+    </div>
+  </div>
+
+  <!-- DESKTOP SPLIT -->
+  <div class="split">
+    <div class="panel-form" id="desktop-form"></div>
+    <div class="panel-quote">
+      <div class="tab-bar">
+        <div class="tab active" id="dtab-quote" onclick="dswitchTab('quote')">Quote</div>
+        <div class="tab" id="dtab-risk" onclick="dswitchTab('risk')">⚠ Parts Risk <span class="tab-pro">PRO</span></div>
+        <div class="tab" id="dtab-preview" onclick="dswitchTab('preview')">PDF</div>
+        <div class="tab" id="dtab-history" onclick="dswitchTab('history')">History <span class="tab-badge" id="dhist-count">0</span></div>
+      </div>
+      <div class="quote-area" id="dpane-quote">
+        <div class="empty-state" id="d-empty"><div class="empty-icon">📋</div><div class="empty-title">No quote yet</div><div class="empty-sub">Fill the form and hit Generate — AI estimate in 30 seconds.</div></div>
+        <div id="d-quote-content" style="display:none">
+          <div id="d-loading-bar" style="display:none"><div class="loading-bar" style="width:100%"></div></div>
+          <div class="quote-header">
+            <div class="quote-meta"><div class="qnum" id="d-qnum">QT-000000</div><div class="qstatus status-draft" id="d-qstatus">DRAFT</div></div>
+            <div class="quote-actions">
+              <button class="act-btn" onclick="copyQuote()">📋 Copy</button>
+              <button class="act-btn" onclick="saveQuote()">💾 Save</button>
+              <button class="act-btn act-btn-primary" onclick="dswitchTab('preview')">🖨 PDF</button>
+            </div>
+          </div>
+          <div id="d-ai-note" style="display:none" class="ai-note"><div class="ai-dot"></div><div id="d-ai-note-text"></div></div>
+          <div id="d-error-note" style="display:none" class="error-note"></div>
+          <div class="items-table">
+            <div class="items-head"><div>Description</div><div>Qty</div><div>Unit $</div><div style="text-align:right">Total</div><div></div></div>
+            <div id="d-items-body"></div>
+            <div class="items-footer">
+              <button class="add-item-btn" onclick="addRow()">+ Add item</button>
+              <div style="font-size:10px;color:var(--muted);font-family:var(--mono)" id="d-item-count">0 items</div>
+            </div>
+          </div>
+          <div class="totals-block">
+            <div class="tot-row"><span>Subtotal</span><span id="d-sub">$0.00</span></div>
+            <div class="tot-row"><span>NC Tax 7.25%</span><span id="d-tax">$0.00</span></div>
+            <div class="tot-divider"></div>
+            <div class="tot-total"><span>TOTAL</span><span id="d-total">$0.00</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="quote-area" id="dpane-risk" style="display:none"><div id="d-risk-content"><div class="empty-state"><div class="empty-icon">⚠</div><div class="empty-title">Generate a quote first</div><div class="empty-sub">AI Parts Risk Advisor analyzes your project automatically.</div></div></div></div>
+      <div class="quote-area" id="dpane-preview" style="display:none"><div id="d-preview-content"><div class="empty-state"><div class="empty-icon">👁</div><div class="empty-title">Nothing to preview</div></div></div></div>
+      <div class="quote-area" id="dpane-history" style="display:none"><div id="d-hist-list"><div class="empty-state"><div class="empty-icon">🕐</div><div class="empty-title">No history yet</div><div class="empty-sub">Pro users get full quote history & saved customers.</div></div></div></div>
+    </div>
+  </div>
+
+  <!-- MOBILE VIEWS -->
+  <div class="mobile-view form-pad active" id="m-form-view"></div>
+  <div class="mobile-view content-pad" id="m-quote-view">
+    <div class="empty-state" id="m-empty"><div class="empty-icon">📋</div><div class="empty-title">No quote yet</div><div class="empty-sub">Go to Form → tap Generate.</div></div>
+    <div id="m-quote-content" style="display:none">
+      <div id="m-loading-bar" style="display:none"><div class="loading-bar" style="width:100%"></div></div>
+      <div class="quote-header">
+        <div class="quote-meta"><div class="qnum" id="m-qnum">QT-000000</div><div class="qstatus status-draft" id="m-qstatus">DRAFT</div></div>
+        <div class="quote-actions">
+          <button class="act-btn" onclick="copyQuote()">📋</button>
+          <button class="act-btn act-btn-primary" onclick="mSwitchView('preview')">🖨 PDF</button>
+        </div>
+      </div>
+      <div id="m-ai-note" style="display:none" class="ai-note"><div class="ai-dot"></div><div id="m-ai-note-text"></div></div>
+      <div id="m-error-note" style="display:none" class="error-note"></div>
+      <div class="items-table">
+        <div class="items-head"><div>Description</div><div>Qty</div><div>Unit $</div><div style="text-align:right">Total</div><div></div></div>
+        <div id="m-items-body"></div>
+        <div class="items-footer">
+          <button class="add-item-btn" onclick="addRow()">+ Add</button>
+          <div style="font-size:10px;color:var(--muted);font-family:var(--mono)" id="m-item-count">0 items</div>
+        </div>
+      </div>
+      <div class="totals-block">
+        <div class="tot-row"><span>Subtotal</span><span id="m-sub">$0.00</span></div>
+        <div class="tot-row"><span>NC Tax 7.25%</span><span id="m-tax">$0.00</span></div>
+        <div class="tot-divider"></div>
+        <div class="tot-total"><span>TOTAL</span><span id="m-total">$0.00</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="mobile-view content-pad" id="m-preview-view"><div id="m-preview-content"><div class="empty-state"><div class="empty-icon">👁</div><div class="empty-title">Nothing to preview</div></div></div></div>
+  <div class="mobile-view content-pad" id="m-history-view"><div id="m-hist-list"><div class="empty-state"><div class="empty-icon">🕐</div><div class="empty-title">No history yet</div></div></div></div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-item active" id="bnav-form" onclick="mSwitchView('form')"><div class="bnav-icon">📝</div><div>Form</div></button>
+    <button class="bnav-item bnav-gen" id="bnav-gen" onclick="mGenerate()"><div class="bnav-icon">⚡</div><div>Generate</div></button>
+    <button class="bnav-item" id="bnav-quote" onclick="mSwitchView('quote')"><div class="bnav-icon">📄</div><div>Quote</div></button>
+    <button class="bnav-item" id="bnav-preview" onclick="mSwitchView('preview')"><div class="bnav-icon">🖨</div><div>PDF</div></button>
+  </div>
+</nav>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()">
+
+  <!-- LOGIN MODAL -->
+  <div class="modal" id="modal-login" style="display:none">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-title">Sign In</div>
+    <div class="modal-sub">Access your quotes and Pro features.</div>
+    <div class="form-gap">
+      <div class="field-group"><div class="lbl">Email</div><input type="email" id="login-email" placeholder="you@example.com"></div>
+      <div class="field-group"><div class="lbl">Password</div><input type="password" id="login-pass" placeholder="••••••••"></div>
+      <button class="btn-full btn-orange" onclick="doLogin()">Sign In</button>
+      <div class="divider-text">or</div>
+      <button class="btn-full btn-google" onclick="doGoogleLogin()">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </button>
+      <div style="text-align:center;font-size:12px;color:var(--muted)">No account? <a href="#" onclick="openModal('signup')" style="color:var(--orange)">Create one free</a></div>
+    </div>
+  </div>
+
+  <!-- SIGNUP MODAL -->
+  <div class="modal" id="modal-signup" style="display:none">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-title">Create Account</div>
+    <div class="modal-sub">Start with free plan. Upgrade anytime.</div>
+    <div class="form-gap">
+      <div class="field-group"><div class="lbl">Email</div><input type="email" id="signup-email" placeholder="you@example.com"></div>
+      <div class="field-group"><div class="lbl">Password</div><input type="password" id="signup-pass" placeholder="Min 8 characters"></div>
+      <div class="field-group"><div class="lbl">Business name</div><input type="text" id="signup-biz" placeholder="Triangle HVAC Pro LLC"></div>
+      <button class="btn-full btn-orange" onclick="doSignup()">Create Account</button>
+      <div class="divider-text">or</div>
+      <button class="btn-full btn-google" onclick="doGoogleLogin()">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </button>
+      <div style="text-align:center;font-size:12px;color:var(--muted)">Already have an account? <a href="#" onclick="openModal('login')" style="color:var(--orange)">Sign in</a></div>
+    </div>
+  </div>
+
+  <!-- UPGRADE MODAL -->
+  <div class="modal" id="modal-upgrade" style="display:none">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div class="modal-title">Upgrade BinIn30</div>
+    <div class="modal-sub">Choose the plan that fits your business.</div>
+    <div class="plan-cards">
+      <div class="plan-card selected" id="plan-pro" onclick="selectPlan('pro')">
+        <div class="plan-name">PRO</div>
+        <div class="plan-price">$29<span style="font-size:14px;font-weight:400">/mo</span></div>
+        <div class="plan-features">✓ Unlimited quotes<br>✓ Custom logo<br>✓ Quote history<br>✓ Parts Risk AI<br>✓ Field Notes AI<br>✓ Saved customers</div>
+      </div>
+      <div class="plan-card" id="plan-business" onclick="selectPlan('business')">
+        <div class="plan-name">BUSINESS</div>
+        <div class="plan-price">$49<span style="font-size:14px;font-weight:400">/mo</span></div>
+        <div class="plan-features">✓ Everything in Pro<br>✓ Multi-technician<br>✓ Team dashboard<br>✓ Analytics<br>✓ Multi-location<br>✓ Usage reporting</div>
+      </div>
+    </div>
+    <button class="btn-full btn-orange" onclick="doUpgrade()">Get Started — Launch offer $19/mo</button>
+    <div style="text-align:center;font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:10px">Cancel anytime · No contracts · Secure payment</div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const FREE_LIMIT = 5;
+const QUOTA_KEY = 'binin30_free_used';
+const SESSION_KEY = 'binin30_session';
+
+let items = [], urgency = 'standard', historyList = [], quoteReady = false;
+let currentNote = '', currentRisk = null, currentFieldNotes = [];
+let currentQnum = 'QT-000000';
+let selectedPlan = 'pro';
+let session = null; // { user, token, plan, profile }
+
+const cats = {
+  HVAC: ['AC Replacement','Compressor Repair','Duct Cleaning','Furnace Install','Filter Change','Thermostat','Capacitor','Contactor','Blower Motor'],
+  Electrical: ['Panel Upgrade','New Circuits','Outlet Install','EV Charger','Generator Hook-up','LED Retrofit','GFCI Install','AFCI Breakers'],
+  Plumbing: ['Water Heater','Drain Unclog','Pipe Replace','Leak Repair','Fixture Install','Sewer Line','Shutoff Valve','Expansion Tank'],
+  Roofing: ['Full Replace','Shingle Repair','Gutter Install','Flashing Repair','Inspection','Flat Roof Coat'],
+  Painting: ['Interior Paint','Exterior Paint','Cabinet Paint','Deck Stain','Pressure Wash','Trim Work'],
+  Concrete: ['Driveway','Patio Slab','Sidewalk','Foundation Repair','Stamped Concrete','Retaining Wall'],
+  Carpentry: ['Deck Build','Framing','Cabinet Install','Door/Window','Fence','Trim & Moulding'],
+  General: ['Labor','Materials','Cleanup','Mobilization','Permit Fees','Consultation']
+};
+
+const fmt = n => new Intl.NumberFormat('en-US', {style:'currency',currency:'USD'}).format(n);
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+let form = {biz:'',client:'',phone:'',addr:'',type:'HVAC',time:'1–3 days',desc:''};
+
+// ============================================================
+// QUOTA (free users)
+// ============================================================
+function getUsed() { return parseInt(localStorage.getItem(QUOTA_KEY)||'0'); }
+function incUsed() { localStorage.setItem(QUOTA_KEY, getUsed()+1); }
+function getRemaining() { return Math.max(0, FREE_LIMIT - getUsed()); }
+function isPro() { return session && (session.plan === 'pro' || session.plan === 'business'); }
+
+function updateQuotaBadge() {
+  const badge = document.getElementById('quota-badge');
+  if (!badge) return;
+  if (isPro()) {
+    badge.textContent = '⚡ PRO · Unlimited';
+    badge.className = 'quota-badge';
+    badge.style.color = 'var(--orange)';
+    badge.style.borderColor = 'var(--orange)';
+    return;
+  }
+  const r = getRemaining();
+  badge.textContent = `FREE · ${r} / ${FREE_LIMIT} quotes left`;
+  badge.className = 'quota-badge' + (r === 0 ? ' empty' : r <= 2 ? ' low' : '');
+}
+
+// ============================================================
+// SESSION
+// ============================================================
+function loadSession() {
+  try { session = JSON.parse(localStorage.getItem(SESSION_KEY)||'null'); } catch { session = null; }
+  renderNav();
+  updateQuotaBadge();
+}
+
+function renderNav() {
+  const nr = document.getElementById('nav-right');
+  if (!nr) return;
+  if (session) {
+    const plan = session.plan || 'free';
+    const crown = plan !== 'free' ? '<span class="pro-crown">👑</span>' : '';
+    nr.innerHTML = `
+      <div class="user-pill">${crown} ${esc(session.email||'User')}</div>
+      ${plan === 'free' ? '<button class="btn-upgrade" onclick="openModal(\'upgrade\')">Pro $29/mo</button>' : ''}
+      <button class="btn-logout" onclick="doLogout()">Sign out</button>`;
+  } else {
+    nr.innerHTML = `
+      <div class="quota-badge" id="quota-badge">FREE · ${getRemaining()} / ${FREE_LIMIT} quotes left</div>
+      <button class="btn-login" onclick="openModal('login')">Sign in</button>
+      <button class="btn-upgrade" onclick="openModal('upgrade')">Pro $29/mo</button>`;
+  }
+  updateQuotaBadge();
+  updateLogoDisplay();
+}
+
+function updateLogoDisplay() {
+  const img = document.getElementById('nav-logo');
+  if (!img) return;
+  if (session?.profile?.logo_url) {
+    img.src = session.profile.logo_url;
+    img.style.display = 'block';
+  } else {
+    img.style.display = 'none';
+  }
+}
+
+// ============================================================
+// FORM
+// ============================================================
+function formHTML(prefix) {
+  return `
+  <div class="field-group"><div class="lbl">Your business</div><input type="text" id="${prefix}f-biz" value="${esc(form.biz)}" placeholder="Triangle HVAC Pro LLC" oninput="form.biz=this.value"></div>
+  <div class="field-row">
+    <div class="field-group"><div class="lbl">Client name</div><input type="text" id="${prefix}f-client" value="${esc(form.client)}" placeholder="Marcus Johnson" oninput="form.client=this.value"></div>
+    <div class="field-group"><div class="lbl">Phone</div><input type="text" id="${prefix}f-phone" value="${esc(form.phone)}" placeholder="(919) 555-0100" oninput="form.phone=this.value"></div>
+  </div>
+  <div class="field-group"><div class="lbl">Job address</div><input type="text" id="${prefix}f-addr" value="${esc(form.addr)}" placeholder="123 Main St, Cary NC 27513" oninput="form.addr=this.value"></div>
+  <div class="field-row">
+    <div class="field-group"><div class="lbl">Service</div><select id="${prefix}f-type" onchange="form.type=this.value;renderChips('${prefix}')">
+      ${Object.keys(cats).map(k=>`<option${form.type===k?' selected':''}>${k}</option>`).join('')}
+    </select></div>
+    <div class="field-group"><div class="lbl">Timeline</div><select id="${prefix}f-time" onchange="form.time=this.value">
+      ${['Same day','1–3 days','1 week','2–4 weeks','1–3 months'].map(t=>`<option${form.time===t?' selected':''}>${t}</option>`).join('')}
+    </select></div>
+  </div>
+  <div class="field-group">
+    <div class="lbl">Urgency</div>
+    <div class="urgency-row">
+      <div class="urgency-btn${urgency==='standard'?' active':''}" onclick="setUrgency('standard',this)">Standard</div>
+      <div class="urgency-btn${urgency==='urgent'?' active':''}" onclick="setUrgency('urgent',this)">Urgent +25%</div>
+      <div class="urgency-btn${urgency==='emergency'?' active':''}" onclick="setUrgency('emergency',this)">Emergency +50%</div>
+    </div>
+  </div>
+  <div class="field-group">
+    <div class="lbl">Project description</div>
+    <textarea id="${prefix}f-desc" placeholder="e.g. Replace 3.5-ton AC compressor, 2,200 sqft home. Include labor, refrigerant, 1-yr warranty." oninput="form.desc=this.value">${esc(form.desc)}</textarea>
+    <div class="chip-row" id="${prefix}chip-row"></div>
+  </div>
+  <button class="gen-btn" id="${prefix}gen-btn" onclick="generate('${prefix}')">⚡ Generate with AI</button>
+  <button class="manual-btn" onclick="manualEntry()">Enter manually →</button>`;
+}
+
+function renderChips(prefix) {
+  const el = document.getElementById(prefix+'chip-row');
+  if (!el) return;
+  el.innerHTML = (cats[form.type]||[]).map(c=>`<div class="chip" onclick="appendDesc('${esc(c)}','${prefix}')">${c}</div>`).join('');
+}
+
+function appendDesc(txt, prefix) {
+  form.desc = form.desc ? form.desc+', '+txt : txt;
+  const el = document.getElementById(prefix+'f-desc');
+  if (el) el.value = form.desc;
+}
+
+function setUrgency(u, el) {
+  urgency = u;
+  document.querySelectorAll('.urgency-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ============================================================
+// TABS / VIEWS
+// ============================================================
+function dswitchTab(t) {
+  ['quote','risk','preview','history'].forEach(p=>{
+    const pane = document.getElementById('dpane-'+p);
+    const tab = document.getElementById('dtab-'+p);
+    if (pane) pane.style.display = p===t ? 'block' : 'none';
+    if (tab) tab.classList.toggle('active', p===t);
+  });
+}
+
+function mSwitchView(v) {
+  ['form','quote','preview','history'].forEach(p=>{
+    const el = document.getElementById('m-'+p+'-view');
+    if (el) el.classList.toggle('active', p===v);
+    const bn = document.getElementById('bnav-'+p);
+    if (bn) bn.classList.toggle('active', p===v);
+  });
+}
+
+// ============================================================
+// GENERATE — calls /api/generate-quote (secure backend)
+// ============================================================
+async function generate(prefix) {
+  if (!form.desc.trim()) {
+    const el = document.getElementById(prefix+'f-desc');
+    if (el) { el.focus(); el.style.borderColor='var(--red)'; setTimeout(()=>el.style.borderColor='',2000); }
+    return;
+  }
+
+  // Free quota check
+  if (!isPro() && getRemaining() <= 0) {
+    openModal('upgrade');
+    return;
+  }
+
+  const btn = document.getElementById(prefix+'gen-btn');
+  const genBnav = document.getElementById('bnav-gen');
+  if (btn) { btn.disabled=true; btn.textContent='⚡ Generating...'; }
+  if (genBnav) genBnav.style.opacity='0.5';
+
+  showQuoteContent();
+  if (prefix==='m-') mSwitchView('quote');
+
+  setLoading(true);
+  items=[]; quoteReady=false; currentQnum=makeQnum();
+  renderItems(); setQStatus('DRAFT','draft');
+  hideNotices();
+
+  try {
+    const headers = {'Content-Type':'application/json'};
+    if (session?.token) headers['Authorization'] = 'Bearer '+session.token;
+
+    const res = await fetch('/api/generate-quote', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        serviceType: form.type,
+        description: form.desc,
+        timeline: form.time,
+        urgency,
+        isPro: isPro()
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error||'Server error');
+
+    if (data.items?.length) {
+      items = data.items.map(i=>({desc:i.desc||'',qty:i.qty||1,up:i.up||0}));
+      currentNote = data.note||'';
+      currentRisk = data.risk||null;
+      currentFieldNotes = data.fieldNotes||[];
+    }
+
+    if (!isPro()) incUsed();
+    quoteReady = true;
+
+    document.getElementById('s-time').textContent = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('s-quotes').textContent = parseInt(document.getElementById('s-quotes').textContent||'0')+1;
+
+    if (currentNote) showAiNote(currentNote);
+    if (currentRisk) renderRiskAdvisor();
+    setQStatus('READY','ready');
+    updateQuotaBadge();
+
+  } catch(err) {
+    showErrorNote(err.message||'Generation failed. Please try again.');
+    items = [{desc:'Labor',qty:1,up:0},{desc:'Materials',qty:1,up:0}];
+  } finally {
+    setLoading(false);
+    renderItems();
+    if (btn) { btn.disabled=false; btn.textContent='⚡ Generate with AI'; }
+    if (genBnav) genBnav.style.opacity='1';
+  }
+}
+
+function mGenerate() { generate('m-'); }
+
+function makeQnum() { return 'QT-'+Date.now().toString().slice(-6); }
+
+function setLoading(on) {
+  ['d-loading-bar','m-loading-bar'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.style.display=on?'block':'none';
+  });
+}
+
+function showQuoteContent() {
+  document.getElementById('d-empty').style.display='none';
+  document.getElementById('d-quote-content').style.display='block';
+  document.getElementById('m-empty').style.display='none';
+  document.getElementById('m-quote-content').style.display='block';
+}
+
+function setQStatus(txt,type) {
+  ['d-qstatus','m-qstatus'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return; el.textContent=txt; el.className='qstatus status-'+type;
+  });
+  ['d-qnum','m-qnum'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.textContent=currentQnum;
+  });
+}
+
+function showAiNote(txt) {
+  ['d-ai-note','m-ai-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='flex';});
+  ['d-ai-note-text','m-ai-note-text'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=txt;});
+}
+
+function showErrorNote(txt) {
+  ['d-error-note','m-error-note'].forEach(id=>{
+    const el=document.getElementById(id); if(el){el.style.display='block';el.textContent='⚠ '+txt;}
+  });
+}
+
+function hideNotices() {
+  ['d-ai-note','m-ai-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  ['d-error-note','m-error-note'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+}
+
+// ============================================================
+// ITEMS
+// ============================================================
+function addRow(desc,qty,up) { items.push({desc:desc||'',qty:qty||1,up:up||0}); renderItems(); }
+function removeRow(i) { items.splice(i,1); renderItems(); }
+
+function renderItems() {
+  const rowHTML = items.map((it,i)=>`
+    <div class="item-row">
+      <input value="${esc(it.desc)}" placeholder="Description..." oninput="items[${i}].desc=this.value">
+      <input type="number" value="${it.qty}" min="0" step="1" style="text-align:center" oninput="items[${i}].qty=parseFloat(this.value)||0;updateTotals()">
+      <div class="price-cell"><span>$</span><input type="number" value="${it.up}" min="0" step="0.01" oninput="items[${i}].up=parseFloat(this.value)||0;updateTotals()"></div>
+      <div class="total-cell">${fmt(it.qty*it.up)}</div>
+      <button class="del-btn" onclick="removeRow(${i})">×</button>
+    </div>`).join('');
+  ['d-items-body','m-items-body'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=rowHTML;});
+  const cnt = items.length+' item'+(items.length!==1?'s':'');
+  ['d-item-count','m-item-count'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=cnt;});
+  updateTotals();
+}
+
+function updateTotals() {
+  const sub=items.reduce((s,i)=>s+i.qty*i.up,0), tax=sub*0.0725, total=sub+tax;
+  [['d-sub','m-sub'],['d-tax','m-tax'],['d-total','m-total']].forEach(([a,b],idx)=>{
+    const v=[fmt(sub),fmt(tax),fmt(total)][idx];
+    [a,b].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=v;});
+  });
+  document.getElementById('s-value').textContent=fmt(total);
+  renderPreview();
+}
+
+function manualEntry() {
+  showQuoteContent(); currentQnum=makeQnum();
+  setQStatus('DRAFT','draft');
+  items=[{desc:'',qty:1,up:0}]; renderItems();
+}
+
+// ============================================================
+// RISK ADVISOR (PRO)
+// ============================================================
+function renderRiskAdvisor() {
+  const el = document.getElementById('d-risk-content');
+  if (!el || !currentRisk) return;
+
+  if (!isPro()) {
+    el.innerHTML = `<div class="pro-gate">
+      <div class="pro-gate-title">⚠ AI Parts Risk Advisor</div>
+      <div class="pro-gate-sub">Identify forgotten parts, long lead-time components, permit risks, and supply chain delays before your quote goes out.</div>
+      <button class="btn-full btn-orange" style="max-width:240px;margin:0 auto" onclick="openModal('upgrade')">Unlock with Pro</button>
+    </div>`;
+    return;
+  }
+
+  const r = currentRisk;
+  let html = `<div class="risk-section"><div class="risk-title">⚠ POTENTIAL PARTS DELAY RISK</div>`;
+
+  if (r.forgotten?.length) {
+    html += `<div class="risk-group"><div class="risk-group-label">Commonly Forgotten Parts</div><div class="risk-items">${r.forgotten.map(x=>`<span class="risk-item">${esc(x)}</span>`).join('')}</div></div>`;
+  }
+  if (r.related?.length) {
+    html += `<div class="risk-group"><div class="risk-group-label">Associated Replacement Parts</div><div class="risk-items">${r.related.map(x=>`<span class="risk-item">${esc(x)}</span>`).join('')}</div></div>`;
+  }
+  if (r.delays?.length) {
+    html += `<div class="risk-group"><div class="risk-group-label">⏳ Long Lead-Time Items</div><div class="risk-items">${r.delays.map(x=>`<span class="risk-item delay">${esc(x)}</span>`).join('')}</div></div>`;
+  }
+  if (r.permits?.length) {
+    html += `<div class="risk-group"><div class="risk-group-label">📋 Permit / Inspection Risks</div><div class="risk-items">${r.permits.map(x=>`<span class="risk-item permit">${esc(x)}</span>`).join('')}</div></div>`;
+  }
+  html += `<div style="font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:10px">⚠ Recommendations only — do not add automatically to quote.</div></div>`;
+
+  if (currentFieldNotes.length) {
+    html += `<div class="field-notes"><div class="field-notes-title">📋 AI FIELD NOTES</div>${currentFieldNotes.map(n=>`<div class="field-note-item">${esc(n)}</div>`).join('')}</div>`;
+  }
+
+  el.innerHTML = html;
+}
+
+// ============================================================
+// PREVIEW / PDF
+// ============================================================
+function renderPreview() {
+  const sub=items.reduce((s,i)=>s+i.qty*i.up,0), tax=sub*0.0725, total=sub+tax;
+  const vi=items.filter(i=>i.desc);
+  const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const valid=new Date(Date.now()+30*86400000).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const profile = session?.profile||{};
+  const bizName = profile.business_name||form.biz||'Your Business';
+  const logoHTML = (isPro()&&profile.logo_url) ? `<img class="print-logo" src="${esc(profile.logo_url)}" alt="Logo">` : '';
+  const brandingFooter = isPro() ? '' : '<div style="font-size:10px;color:#bbb;text-align:center;margin-top:4px">Generated by BinIn30.com</div>';
+
+  const html = vi.length ? `
+  <div style="margin-bottom:14px;display:flex;gap:8px">
+    <button class="act-btn act-btn-primary" onclick="window.print()">🖨 Print / Save PDF</button>
+    ${isPro() ? '<button class="act-btn" onclick="saveQuote()">💾 Save Quote</button>' : ''}
+  </div>
+  <div class="print-doc">
+    <div style="display:flex;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:14px">
+      <div>
+        ${logoHTML}
+        <div style="font-size:22px;font-weight:800;color:#0c0c0e">${esc(bizName)}</div>
+        <div style="color:#666;font-size:12px;margin-top:2px">${esc(profile.address||'Research Triangle Park, NC')}</div>
+        ${profile.phone?`<div style="color:#666;font-size:12px">${esc(profile.phone)}</div>`:''}
+        ${profile.license?`<div style="color:#888;font-size:11px">License #${esc(profile.license)}</div>`:''}
+      </div>
+      <div style="text-align:right">
+        <div style="background:#0c0c0e;color:#f97316;padding:4px 14px;border-radius:4px;font-size:11px;letter-spacing:3px;font-weight:800;display:inline-block;margin-bottom:6px">ESTIMATE</div>
+        <div style="font-size:11px;color:#888">Quote #: ${currentQnum}</div>
+        <div style="font-size:11px;color:#888">Date: ${today}</div>
+        <div style="font-size:11px;color:#888">Valid: ${valid}</div>
+      </div>
+    </div>
+    <div style="height:2px;background:linear-gradient(to right,#0c0c0e,#f97316);margin-bottom:20px"></div>
+    <div style="margin-bottom:20px">
+      <div style="font-size:10px;color:#999;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px">Bill To</div>
+      <div style="font-size:15px;font-weight:800;color:#0c0c0e">${esc(form.client||'Client')}</div>
+      ${form.addr?`<div style="color:#555;font-size:12px">${esc(form.addr)}</div>`:''}
+      <div style="color:#777;font-size:11px;margin-top:2px">${esc(form.type)} · ${esc(form.time)}${urgency!=='standard'?' · <span style="color:#f97316">'+urgency+'</span>':''}</div>
+    </div>
+    <table>
+      <thead><tr><th>Description</th><th style="text-align:center">Qty</th><th style="text-align:right">Unit $</th><th style="text-align:right">Total</th></tr></thead>
+      <tbody>${vi.map((it,i)=>`<tr style="background:${i%2===0?'#fff':'#f9f9fc'}"><td>${esc(it.desc)}</td><td style="text-align:center">${it.qty}</td><td style="text-align:right">${fmt(it.up)}</td><td style="text-align:right;font-weight:700">${fmt(it.qty*it.up)}</td></tr>`).join('')}</tbody>
+    </table>
+    <div style="display:flex;justify-content:flex-end">
+      <div style="width:220px;font-size:12px">
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:#555"><span>Subtotal</span><span>${fmt(sub)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;color:#555"><span>NC Sales Tax (7.25%)</span><span>${fmt(tax)}</span></div>
+        <div style="height:1px;background:#0c0c0e;margin:8px 0"></div>
+        <div style="display:flex;justify-content:space-between;font-size:17px;font-weight:800"><span>TOTAL</span><span style="color:#f97316">${fmt(total)}</span></div>
+      </div>
+    </div>
+    ${currentNote?`<div style="margin-top:18px;padding:10px 14px;background:#fff8f2;border-left:3px solid #f97316;font-size:12px;color:#555"><strong>Note:</strong> ${esc(currentNote)}</div>`:''}
+    <div style="margin-top:24px;padding-top:14px;border-top:1px solid #eee;font-size:10px;color:#aaa;text-align:center">Valid 30 days · 50% deposit on acceptance</div>
+    ${brandingFooter}
+  </div>` : `<div class="empty-state"><div class="empty-icon">👁</div><div class="empty-title">Nothing to preview</div></div>`;
+
+  ['d-preview-content','m-preview-content'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=html;});
+}
+
+// ============================================================
+// HISTORY
+// ============================================================
+function saveQuote() {
+  if (!isPro()) { openModal('upgrade'); return; }
+  const sub=items.reduce((s,i)=>s+i.qty*i.up,0);
+  historyList.unshift({id:currentQnum,client:form.client||'Client',type:form.type,total:sub*1.0725,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),items:[...items.map(i=>({...i}))]});
+  const hc=document.getElementById('dhist-count'); if(hc) hc.textContent=historyList.length;
+  renderHistory();
+  alert('Quote saved!');
+}
+
+function renderHistory() {
+  if (!isPro()) {
+    const html=`<div class="pro-gate"><div class="pro-gate-title">🕐 Quote History</div><div class="pro-gate-sub">Save and retrieve all your past quotes. Never lose a customer estimate again.</div><button class="btn-full btn-orange" style="max-width:220px;margin:0 auto" onclick="openModal('upgrade')">Unlock with Pro</button></div>`;
+    ['d-hist-list','m-hist-list'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=html;});
+    return;
+  }
+  const html=historyList.length?historyList.map(h=>`<div class="hist-item" onclick="loadHistory('${h.id}')"><div><div class="hist-name">${esc(h.client)} — ${esc(h.type)}</div><div class="hist-meta">${h.id} · ${h.date}</div></div><div class="hist-amount">${fmt(h.total)}</div></div>`).join(''):`<div class="empty-state"><div class="empty-icon">🕐</div><div class="empty-title">No saved quotes yet</div><div class="empty-sub">Save quotes using the 💾 button.</div></div>`;
+  ['d-hist-list','m-hist-list'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=html;});
+}
+
+function loadHistory(id) {
+  const h=historyList.find(x=>x.id===id); if(!h)return;
+  currentQnum=h.id; items=[...h.items.map(i=>({...i}))];
+  showQuoteContent(); quoteReady=true; setQStatus('READY','ready'); renderItems();
+  dswitchTab('quote'); mSwitchView('quote');
+}
+
+// ============================================================
+// COPY
+// ============================================================
+function copyQuote() {
+  const lines=['Quote: '+currentQnum,'','ITEMS:'];
+  items.filter(i=>i.desc).forEach(i=>lines.push(i.qty+'x '+i.desc+' — '+fmt(i.up)+' = '+fmt(i.qty*i.up)));
+  const sub=items.reduce((s,i)=>s+i.qty*i.up,0);
+  lines.push('','Subtotal: '+fmt(sub),'Tax 7.25%: '+fmt(sub*0.0725),'TOTAL: '+fmt(sub*1.0725));
+  navigator.clipboard?.writeText(lines.join('\n')).then(()=>alert('Copied!')).catch(()=>{});
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal(name) {
+  document.getElementById('modal-overlay').style.display='flex';
+  ['login','signup','upgrade'].forEach(m=>{
+    const el=document.getElementById('modal-'+m);
+    if(el) el.style.display=m===name?'block':'none';
+  });
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').style.display='none';
+}
+
+function selectPlan(p) {
+  selectedPlan=p;
+  ['pro','business'].forEach(id=>{
+    const el=document.getElementById('plan-'+id);
+    if(el) el.classList.toggle('selected',id===p);
+  });
+}
+
+// ============================================================
+// AUTH (calls /api/auth — Supabase on backend)
+// ============================================================
+async function doLogin() {
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  if(!email||!pass){alert('Please fill all fields');return;}
+  try{
+    const res=await fetch('/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||'Login failed');
+    session=data; localStorage.setItem(SESSION_KEY,JSON.stringify(data));
+    closeModal(); renderNav(); renderHistory();
+    alert('Welcome back!');
+  }catch(e){alert(e.message);}
+}
+
+async function doSignup() {
+  const email=document.getElementById('signup-email').value.trim();
+  const pass=document.getElementById('signup-pass').value;
+  const biz=document.getElementById('signup-biz').value.trim();
+  if(!email||!pass||!biz){alert('Please fill all fields');return;}
+  if(pass.length<8){alert('Password must be at least 8 characters');return;}
+  try{
+    const res=await fetch('/api/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass,businessName:biz})});
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||'Signup failed');
+    session=data; localStorage.setItem(SESSION_KEY,JSON.stringify(data));
+    closeModal(); renderNav();
+    alert('Account created! Welcome to BinIn30.');
+  }catch(e){alert(e.message);}
+}
+
+function doGoogleLogin() {
+  window.location.href='/api/auth/google';
+}
+
+function doLogout() {
+  session=null; localStorage.removeItem(SESSION_KEY);
+  renderNav(); renderHistory(); updateQuotaBadge();
+}
+
+function doUpgrade() {
+  if(!session){ openModal('signup'); return; }
+  window.location.href='/api/billing/checkout?plan='+selectedPlan;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  loadSession();
+  document.getElementById('desktop-form').innerHTML=formHTML('d-');
+  renderChips('d-');
+  document.getElementById('m-form-view').innerHTML=formHTML('m-');
+  renderChips('m-');
+  renderHistory();
+}
+
+init();
+</script>
+</body>
+</html>
