@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BinIn30 — API Diagnostic</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0c0c0e;color:#f0f0f0;font-family:'Courier New',monospace;padding:24px}
+h1{color:#f97316;font-size:20px;margin-bottom:20px}
+.btn{background:#f97316;color:#000;border:none;padding:12px 24px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-right:10px;margin-bottom:10px}
+.btn:hover{background:#fb923c}
+.btn-sec{background:#1c1c22;color:#f0f0f0;border:1px solid #2a2a32}
+.section{background:#141418;border:1px solid #2a2a32;border-radius:8px;padding:16px;margin-bottom:16px}
+.section h2{font-size:13px;color:#6b7280;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+pre{background:#0a0a0c;border:1px solid #1e2a32;border-radius:6px;padding:12px;font-size:12px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;max-height:400px;overflow-y:auto}
+.ok{color:#22c55e}
+.err{color:#ef4444}
+.warn{color:#f59e0b}
+.info{color:#3b82f6}
+.status{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:#6b7280}
+.dot.ok{background:#22c55e}
+.dot.err{background:#ef4444}
+.dot.loading{background:#f59e0b;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+</style>
+</head>
+<body>
+<h1>🔧 BinIn30 — API Diagnostic</h1>
+
+<div class="section">
+  <h2>Test Controls</h2>
+  <button class="btn" onclick="testAPI()">▶ Run Full API Test</button>
+  <button class="btn btn-sec" onclick="checkEnv()">🔍 Check Environment</button>
+  <button class="btn btn-sec" onclick="clearLog()">🗑 Clear</button>
+</div>
+
+<div class="section">
+  <h2>Test Payload</h2>
+  <pre id="payload">{
+  "serviceType": "HVAC",
+  "description": "Replace 3.5-ton AC compressor on a 2,200 sqft home in Cary NC. Unit is 10 years old. Include labor, refrigerant, and 1-year parts warranty.",
+  "timeline": "1-3 days",
+  "urgency": "standard",
+  "isPro": false
+}</pre>
+</div>
+
+<div class="section">
+  <h2>Request Log</h2>
+  <div id="request-log"><span class="warn">No request yet. Click "Run Full API Test".</span></div>
+</div>
+
+<div class="section">
+  <h2>Response</h2>
+  <pre id="response-output"><span class="warn">Awaiting response...</span></pre>
+</div>
+
+<div class="section">
+  <h2>Parsed Items</h2>
+  <div id="items-output"><span class="warn">No items yet.</span></div>
+</div>
+
+<div class="section">
+  <h2>Checklist</h2>
+  <div id="checklist">
+    <div class="status"><div class="dot" id="d-endpoint"></div><span id="s-endpoint">Endpoint /api/generate-quote — not tested</span></div>
+    <div class="status"><div class="dot" id="d-http"></div><span id="s-http">HTTP status — not tested</span></div>
+    <div class="status"><div class="dot" id="d-json"></div><span id="s-json">JSON parse — not tested</span></div>
+    <div class="status"><div class="dot" id="d-items"></div><span id="s-items">Items array — not tested</span></div>
+    <div class="status"><div class="dot" id="d-totals"></div><span id="s-totals">Subtotal / Tax / Total — not tested</span></div>
+    <div class="status"><div class="dot" id="d-note"></div><span id="s-note">AI note — not tested</span></div>
+  </div>
+</div>
+
+<script>
+const log = document.getElementById('request-log');
+const out = document.getElementById('response-output');
+const items = document.getElementById('items-output');
+
+function addLog(msg, cls=''){
+  const d = document.createElement('div');
+  d.innerHTML = `<span class="${cls}">[${new Date().toLocaleTimeString()}] ${msg}</span>`;
+  log.appendChild(d);
+  log.scrollTop = log.scrollHeight;
+}
+
+function setCheck(id, ok, msg){
+  document.getElementById('d-'+id).className = 'dot '+(ok?'ok':'err');
+  document.getElementById('s-'+id).textContent = msg;
+}
+
+function clearLog(){
+  log.innerHTML='';out.innerHTML='<span class="warn">Cleared.</span>';items.innerHTML='';
+  ['endpoint','http','json','items','totals','note'].forEach(id=>{
+    document.getElementById('d-'+id).className='dot';
+    document.getElementById('s-'+id).textContent=id+' — not tested';
+  });
+}
+
+async function checkEnv(){
+  addLog('Checking API endpoint availability...','info');
+  try{
+    const r = await fetch('/api/generate-quote',{method:'OPTIONS'});
+    addLog(`OPTIONS /api/generate-quote → ${r.status}`,'ok');
+  }catch(e){
+    addLog(`OPTIONS failed: ${e.message}`,'err');
+  }
+}
+
+async function testAPI(){
+  log.innerHTML='';
+  out.textContent='⏳ Waiting for response...';
+  items.textContent='';
+
+  const payload = {
+    serviceType: "HVAC",
+    description: "Replace 3.5-ton AC compressor on a 2,200 sqft home in Cary NC. Unit is 10 years old. Include labor, refrigerant, and 1-year parts warranty.",
+    timeline: "1-3 days",
+    urgency: "standard",
+    isPro: false
+  };
+
+  addLog('Starting API diagnostic test...','info');
+  addLog(`Target: POST /api/generate-quote`,'info');
+  addLog(`Payload: ${JSON.stringify(payload)}`);
+
+  // Mark endpoint loading
+  document.getElementById('d-endpoint').className='dot loading';
+  document.getElementById('s-endpoint').textContent='Calling /api/generate-quote...';
+
+  const t0 = Date.now();
+  let res, data, rawText;
+
+  try{
+    res = await fetch('/api/generate-quote', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    const elapsed = Date.now()-t0;
+    addLog(`HTTP status: ${res.status} (${elapsed}ms)`, res.ok?'ok':'err');
+    setCheck('endpoint', true, `Endpoint responded in ${elapsed}ms`);
+    setCheck('http', res.ok, `HTTP ${res.status} ${res.ok?'OK':'ERROR'}`);
+  }catch(e){
+    addLog(`FETCH FAILED: ${e.message}`,'err');
+    setCheck('endpoint', false, `Endpoint unreachable: ${e.message}`);
+    setCheck('http', false, 'Network error');
+    out.textContent = 'FETCH ERROR: '+e.message;
+    return;
+  }
+
+  try{
+    rawText = await res.text();
+    addLog(`Raw response length: ${rawText.length} chars`);
+    addLog(`Raw preview: ${rawText.slice(0,200)}`);
+    out.textContent = rawText;
+  }catch(e){
+    addLog(`Failed to read response body: ${e.message}`,'err');
+    return;
+  }
+
+  try{
+    data = JSON.parse(rawText);
+    addLog('JSON parsed successfully','ok');
+    setCheck('json', true, 'JSON parsed OK');
+    out.textContent = JSON.stringify(data, null, 2);
+  }catch(e){
+    addLog(`JSON parse FAILED: ${e.message}`,'err');
+    setCheck('json', false, `JSON parse error: ${e.message}`);
+    return;
+  }
+
+  // Check for error response
+  if(data.error){
+    addLog(`API returned error: ${data.error}`,'err');
+    if(data.debug) addLog(`Debug: ${data.debug}`,'warn');
+    setCheck('items', false, `API error: ${data.error}`);
+    return;
+  }
+
+  // Check items
+  const hasItems = Array.isArray(data.items) && data.items.length > 0;
+  setCheck('items', hasItems, hasItems ? `${data.items.length} line items returned` : 'items array missing or empty');
+  if(hasItems){
+    addLog(`Items received: ${data.items.length}`,'ok');
+    let html = '<table style="width:100%;border-collapse:collapse;font-size:12px">';
+    html += '<tr><th style="text-align:left;padding:6px;background:#1c1c22;color:#6b7280">Description</th><th style="padding:6px;background:#1c1c22;color:#6b7280">Qty</th><th style="padding:6px;background:#1c1c22;color:#6b7280">Unit</th><th style="padding:6px;background:#1c1c22;color:#6b7280">Total</th></tr>';
+    data.items.forEach(it=>{
+      const fmt = n => '$'+parseFloat(n).toFixed(2);
+      html += `<tr style="border-bottom:1px solid #2a2a32"><td style="padding:6px">${it.desc}</td><td style="padding:6px;text-align:center">${it.qty}</td><td style="padding:6px;text-align:right">${fmt(it.up)}</td><td style="padding:6px;text-align:right">${fmt(it.qty*it.up)}</td></tr>`;
+    });
+    html += '</table>';
+    items.innerHTML = html;
+  }
+
+  // Check totals
+  const hasTotals = data.subtotal !== undefined && data.total !== undefined;
+  setCheck('totals', hasTotals, hasTotals ? `Subtotal: $${data.subtotal} | Tax: $${data.tax} | Total: $${data.total}` : 'subtotal/total missing');
+  if(hasTotals) addLog(`Totals: subtotal=$${data.subtotal} tax=$${data.tax} total=$${data.total}`,'ok');
+
+  // Check note
+  const hasNote = !!data.note;
+  setCheck('note', hasNote, hasNote ? `Note: "${data.note.slice(0,80)}..."` : 'note field missing');
+  if(hasNote) addLog(`AI note: "${data.note.slice(0,100)}"`,'ok');
+
+  addLog(hasItems ? '✅ API WORKING CORRECTLY' : '❌ API NOT RETURNING ITEMS', hasItems?'ok':'err');
+}
+</script>
+</body>
+</html>
