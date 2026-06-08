@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/api/generate-quote", "destination": "/api/generate-quote" },
+    { "source": "/api/login", "destination": "/api/login" },
+    { "source": "/api/signup", "destination": "/api/signup" },
+    { "source": "/api/checkout", "destination": "/api/checkout" },
+    { "source": "/api/webhook", "destination": "/api/webhook" },
+    { "source": "/(.*)", "destination": "/public/index.html" }
+  ]
+}
